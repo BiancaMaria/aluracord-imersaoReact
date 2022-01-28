@@ -1,34 +1,7 @@
 import appConfig from '../config.json';
 import {Box, Button, Text, TextField, Image} from '@skynexui/components';
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  );
-}
+import React,{useState} from 'react';
+import { useRouter } from 'next/router';
 
 function Titulo(props){
   const Tag = props.tag ||'h1';
@@ -60,11 +33,23 @@ export default HomePage;*/
 
 
 export default function PaginaInicial() {
-  const username = 'BiancaMaria';
+    //const username = 'BiancaMaria';
+  const [username, setUsername] = useState('BiancaMaria');
+  const [image, setImage] = useState(`https://github.com/${username}.png`);
+  const roteamento = useRouter();
+
+  function handleUsername(event){
+    const value = event.target.value;//captura o valor do input
+    setUsername(value);//muda o estado de Username de acordo com o valor capturado acima
+
+    if(value.length > 2){//se a qtd de caracteres for maior q 2, carrega a img abaixo
+      return setImage(`https://github.com/${value}.png`);
+    }
+      return setImage('');
+  }
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -91,6 +76,11 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={function (infosdoEvento){
+              infosdoEvento.preventDefault();
+              //console.log('Form foi submetido');
+              roteamento.push('/chat');//pagina foi direcionada pelo hook useRouter
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -102,6 +92,8 @@ export default function PaginaInicial() {
             </Text>
 
             <TextField
+              value={username}
+              onChange={handleUsername}
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -148,7 +140,8 @@ export default function PaginaInicial() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              
+              src={image}
             />
             <Text
               variant="body4"
